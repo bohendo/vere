@@ -97,6 +97,30 @@
         '';
       };
     in {
+      packages = rec {
+        urbit = pkgs.stdenv.mkDerivation {
+          pname = "urbit";
+          version = "2.5";
+          src = ./.;
+          buildInputs = with pkgs; [
+            toolchain
+          ]
+          ++ (with pkgs; [
+            autoconf
+            automake
+            bazel_5
+            binutils # for `nm`
+            jdk11_headless
+            libtool
+            m4
+          ]);
+          buildPhase = ''
+            bazel build :urbit
+            cp bazel-bin/pkg/vere/urbit $out/bin
+          '';
+        };
+      };
+
       devShells.default = (pkgs.buildFHSUserEnvBubblewrap {
         name = "vere-devenv";
         targetPkgs = pkgs: [
